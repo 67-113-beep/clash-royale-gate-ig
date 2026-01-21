@@ -285,20 +285,24 @@
         .knight .troop-sprite { width: 34px; height: 44px; }
         .knight .troop-hp-bar { width: 28px; }
 
-        /* Spin effect for Dylan */
+        /* Spin effect for Dylan - Death Circle */
         .spin-aura {
             position: absolute;
-            width: 60px;
-            height: 60px;
-            border: 3px solid rgba(200, 220, 255, 0.6);
+            width: 90px;
+            height: 90px;
+            border: 3px solid rgba(255, 100, 100, 0.7);
+            background: radial-gradient(circle, rgba(255, 50, 50, 0.15) 0%, rgba(255, 100, 100, 0.1) 60%, transparent 70%);
             border-radius: 50%;
-            animation: spinAura 0.3s linear infinite;
+            transform: translate(-50%, -50%);
+            animation: deathAura 0.2s ease-out;
             pointer-events: none;
             z-index: 19;
+            box-shadow: 0 0 15px rgba(255, 100, 100, 0.5), inset 0 0 20px rgba(255, 150, 150, 0.3);
         }
-        @keyframes spinAura {
-            0% { transform: translate(-50%, -50%) rotate(0deg); opacity: 0.8; }
-            100% { transform: translate(-50%, -50%) rotate(360deg); opacity: 0.8; }
+        @keyframes deathAura {
+            0% { opacity: 0.9; transform: translate(-50%, -50%) scale(0.95); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.02); }
+            100% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); }
         }
 
         /* Effects */
@@ -845,7 +849,8 @@ function spawnKnight(parentTroop) {
         isMinion: false, isKnight: true, parentId: parentTroop.id,
         orbitAngle: 0, // For spinning around princess
         spinRadius: 35,
-        isSpinning: false
+        isSpinning: false,
+        isBlocking: false
     };
 
     gameState.troops.push(knight);
@@ -928,7 +933,7 @@ function initArchers() {
     };
 
     gameState.archers = Object.entries(towerPositions).map(([key, pos]) => ({
-        key, x: pos.x, y: pos.y, player: pos.player, lastShot: 0, range: 110, damage: 50, reloadTime: 1000
+        key, x: pos.x, y: pos.y, player: pos.player, lastShot: 0, range: 110, damage: 10, reloadTime: 1000
     }));
 }
 
@@ -943,12 +948,28 @@ function updateArchers() {
         let target = null;
         let minDist = Infinity;
 
+        // First priority: Find Little Princess (archers always target her first!)
         for (const troop of gameState.troops) {
             if (troop.player === archer.player || troop.hp <= 0) continue;
-            const dist = Math.hypot(troop.x - archer.x, troop.y - archer.y);
-            if (dist < archer.range && dist < minDist) {
-                minDist = dist;
-                target = troop;
+            if (troop.cardId === 'little-princess' && !troop.isKnight) {
+                const dist = Math.hypot(troop.x - archer.x, troop.y - archer.y);
+                if (dist < archer.range) {
+                    target = troop;
+                    minDist = dist;
+                    break; // Always prioritize princess
+                }
+            }
+        }
+
+        // If no princess in range, target closest enemy
+        if (!target) {
+            for (const troop of gameState.troops) {
+                if (troop.player === archer.player || troop.hp <= 0) continue;
+                const dist = Math.hypot(troop.x - archer.x, troop.y - archer.y);
+                if (dist < archer.range && dist < minDist) {
+                    minDist = dist;
+                    target = troop;
+                }
             }
         }
 
@@ -975,6 +996,7 @@ function shootArrow(archer, target) {
     const endX = target.x, endY = target.y;
     const startTime = Date.now();
     const targetId = target.id;
+    const targetPlayer = target.player;
 
     const animateArrow = () => {
         const elapsed = Date.now() - startTime;
@@ -984,6 +1006,26 @@ function shootArrow(archer, target) {
 
         arrow.style.left = x + 'px';
         arrow.style.top = y + 'px';
+
+        // Check if Dylan intercepts the arrow (blocking for princess)
+        const dylan = gameState.troops.find(tr =>
+            tr.isKnight &&
+            tr.player === targetPlayer &&
+            tr.hp > 0 &&
+            tr.isBlocking
+        );
+
+        if (dylan) {
+            const distToDylan = Math.hypot(x - dylan.x, y - dylan.y);
+            if (distToDylan < 18) {
+                // Dylan blocks the arrow!
+                arrow.remove();
+                dylan.hp -= archer.damage;
+                createSlashEffect(dylan.x, dylan.y);
+                updateKnightElement(dylan, CARDS[dylan.cardId]);
+                return; // Arrow blocked
+            }
+        }
 
         if (progress < 1) {
             requestAnimationFrame(animateArrow);
@@ -1127,29 +1169,78 @@ function updateKnight(knight, card, now) {
     const shouldSpin = (nearestEnemy && nearestDist < spinTriggerRange) ||
                        (nearestTower && nearestTowerDist < spinTriggerRange);
 
-    if (shouldSpin && parent && parent.hp > 0) {
-        // SPIN MODE: Circle around Little Princess, damaging everything in path
+    // Check if archers are targeting princess - Dylan should block!
+    let archerThreat = null;
+    if (parent && parent.hp > 0 && parent.cardId === 'little-princess') {
+        for (const archer of gameState.archers) {
+            if (archer.player === knight.player) continue;
+            const towerKey = archer.key.split('-')[1];
+            const playerKey = archer.key.startsWith('p1') ? 'player1' : 'player2';
+            if (gameState[playerKey].towers[towerKey] <= 0) continue;
+
+            const distToParent = Math.hypot(parent.x - archer.x, parent.y - archer.y);
+            if (distToParent < archer.range) {
+                archerThreat = archer;
+                break;
+            }
+        }
+    }
+
+    // BLOCKING MODE: Position between archer and princess
+    if (archerThreat && parent && parent.hp > 0 && !shouldSpin) {
+        knight.isSpinning = false;
+        knight.isBlocking = true;
+
+        // Calculate position between archer and princess
+        const dx = parent.x - archerThreat.x;
+        const dy = parent.y - archerThreat.y;
+        const dist = Math.hypot(dx, dy);
+        const blockDist = 15; // How far in front of princess to stand
+
+        const targetX = parent.x - (dx / dist) * blockDist;
+        const targetY = parent.y - (dy / dist) * blockDist;
+
+        // Move to blocking position
+        knight.x += (targetX - knight.x) * 0.2;
+        knight.y += (targetY - knight.y) * 0.2;
+
+        // Dylan can still slash nearby enemies while blocking!
+        if (nearestEnemy && nearestDist < 40) {
+            if (now - knight.lastAttack >= 800) {
+                nearestEnemy.hp -= knight.damage;
+                createSlashEffect(nearestEnemy.x, nearestEnemy.y);
+                knight.lastAttack = now;
+                updateKnightSprite(knight, card.knightSpinImage);
+            }
+        } else {
+            updateKnightSprite(knight, card.knightIdleImage);
+        }
+    }
+    else if (shouldSpin && parent && parent.hp > 0) {
+        knight.isBlocking = false;
+        // SPIN MODE: Circle around Little Princess, creating a death aura
         knight.isSpinning = true;
-        knight.orbitAngle += 0.12; // Fast orbit speed when spinning
+        knight.orbitAngle += 0.15; // Fast orbit speed when spinning
 
         const targetX = parent.x + Math.cos(knight.orbitAngle) * knight.spinRadius;
         const targetY = parent.y + Math.sin(knight.orbitAngle) * knight.spinRadius;
 
         // Move to orbit position
-        knight.x += (targetX - knight.x) * 0.25;
-        knight.y += (targetY - knight.y) * 0.25;
+        knight.x += (targetX - knight.x) * 0.3;
+        knight.y += (targetY - knight.y) * 0.3;
 
-        // Spin attack - damage all nearby enemies while circling
-        if (now - knight.lastSpinAttack >= 500) {
-            performSpinAttack(knight, card);
+        // DEATH AURA: Anyone inside the spin radius takes damage every 0.2 seconds
+        if (now - knight.lastSpinAttack >= 200) {
+            performDeathAura(knight, parent, card);
             knight.lastSpinAttack = now;
         }
 
         updateKnightSprite(knight, card.knightSpinImage);
     }
-    // If princess is alive but no enemies nearby, follow her
+    // If princess is alive but no enemies nearby, follow her AND follow her movement
     else if (parent && parent.hp > 0) {
         knight.isSpinning = false;
+        knight.isBlocking = false;
 
         // Follow behind Little Princess
         const followDist = 25;
@@ -1168,6 +1259,7 @@ function updateKnight(knight, card, now) {
     // Princess is dead - Dylan fights alone, moves towards targets
     else {
         knight.isSpinning = false;
+        knight.isBlocking = false;
 
         // Find and move towards target
         const target = nearestEnemy || nearestTower;
@@ -1198,19 +1290,45 @@ function updateKnight(knight, card, now) {
     updateKnightElement(knight, card);
 }
 
-function performSpinAttack(knight, card) {
-    const spinRange = 40;
+// Death Aura - damages anyone inside the spin radius around Little Princess
+function performDeathAura(knight, princess, card) {
+    const deathRadius = knight.spinRadius + 10; // The death circle radius
 
-    // Create spin visual effect
-    createSpinAura(knight.x, knight.y);
+    // Create spin visual effect centered on princess
+    createSpinAura(princess.x, princess.y);
 
-    // Damage all nearby enemies
+    let hitSomething = false;
+
+    // Damage all enemies inside the death radius (centered on princess)
     for (const other of gameState.troops) {
         if (other.player === knight.player || other.hp <= 0) continue;
-        const dist = getDistance(knight, other);
-        if (dist < spinRange) {
+        const dist = getDistance(princess, other);
+        if (dist < deathRadius) {
             other.hp -= knight.damage;
             createSlashEffect(other.x, other.y);
+            hitSomething = true;
+        }
+    }
+
+    // Also damage towers inside the radius
+    const enemy = knight.player === 1 ? gameState.player2 : gameState.player1;
+    const towerY = knight.player === 1 ? 65 : 415;
+    const kingY = knight.player === 1 ? 25 : 455;
+    const towers = [
+        { key: 'left', x: 45, y: towerY },
+        { key: 'right', x: 245, y: towerY },
+        { key: 'king', x: 145, y: kingY }
+    ];
+
+    for (const t of towers) {
+        if (enemy.towers[t.key] > 0) {
+            const dist = Math.hypot(princess.x - t.x, princess.y - t.y);
+            if (dist < deathRadius) {
+                enemy.towers[t.key] = Math.max(0, enemy.towers[t.key] - knight.damage);
+                updateTowerDisplay(knight.player === 1 ? 2 : 1, t.key);
+                createSlashEffect(t.x, t.y);
+                hitSomething = true;
+            }
         }
     }
 }
@@ -1221,7 +1339,7 @@ function createSpinAura(x, y) {
     aura.style.left = x + 'px';
     aura.style.top = y + 'px';
     document.getElementById('battlefield').appendChild(aura);
-    setTimeout(() => aura.remove(), 300);
+    setTimeout(() => aura.remove(), 200);
 }
 
 function updateKnightSprite(knight, url) {
