@@ -2,113 +2,133 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Clash Royale Modded</title>
     <link href="https://fonts.googleapis.com/css2?family=Lilita+One&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Bungee&family=Fredoka+One&family=Luckiest+Guy&display=swap');
 
-        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
 
         :root {
             --clash-gold: #f7b529;
             --clash-gold-dark: #c98b1d;
             --elixir-pink: #e056a0;
             --phone-width: 300px;
-            --phone-height: 540px;
+            --phone-height: 500px;
         }
 
         body {
             font-family: 'Luckiest Guy', cursive;
-            overflow: hidden;
+            overflow: auto;
             background: linear-gradient(135deg, #0a1628 0%, #1a2a4a 50%, #0a1628 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
+            padding: 15px 10px 30px 10px;
         }
 
         .game-wrapper {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 6px;
+            gap: 10px;
+            width: 100%;
+            max-width: 400px;
+            padding-bottom: 20px;
         }
 
-        /* External Controls */
+        /* External Controls - Mobile Friendly */
         .external-controls {
             display: none;
-            width: 360px;
+            width: 100%;
+            max-width: 360px;
             background: linear-gradient(180deg, #1e3a5f 0%, #152a45 100%);
             border: 2px solid #0d1a2a;
-            border-radius: 10px;
-            padding: 6px 10px;
-            align-items: center;
+            border-radius: 12px;
+            padding: 8px 10px;
+            flex-direction: column;
             gap: 6px;
         }
 
         .external-controls.top { border-bottom: 3px solid #e74c3c; }
         .external-controls.bottom { border-top: 3px solid #3498db; }
 
-        .player-info { display: flex; flex-direction: column; min-width: 55px; }
-        .player-name { font-size: 10px; color: #e74c3c; text-shadow: 1px 1px 0 #000; }
+        .controls-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .player-info { display: flex; flex-direction: column; min-width: 60px; }
+        .player-name { font-size: 11px; color: #e74c3c; text-shadow: 1px 1px 0 #000; }
         .player-name.blue { color: #3498db; }
-        .crown-count { display: flex; align-items: center; gap: 2px; }
-        .crown-icon { color: var(--clash-gold); font-size: 9px; }
-        .crown-number { font-size: 13px; color: #fff; }
+        .crown-count { display: flex; align-items: center; gap: 3px; }
+        .crown-icon { color: var(--clash-gold); font-size: 10px; }
+        .crown-number { font-size: 14px; color: #fff; }
 
-        .elixir-container { display: flex; align-items: center; gap: 3px; }
-        .elixir-bar { width: 45px; height: 10px; background: #2a1a2a; border: 2px solid #4a2a4a; border-radius: 5px; overflow: hidden; }
+        .elixir-container { display: flex; align-items: center; gap: 4px; }
+        .elixir-bar { width: 60px; height: 12px; background: #2a1a2a; border: 2px solid #4a2a4a; border-radius: 6px; overflow: hidden; }
         .elixir-fill { height: 100%; background: linear-gradient(180deg, #ff6eb4 0%, var(--elixir-pink) 100%); transition: width 0.1s; }
-        .elixir-count { font-size: 11px; color: var(--elixir-pink); text-shadow: 1px 1px 0 #000; }
+        .elixir-count { font-size: 12px; color: var(--elixir-pink); text-shadow: 1px 1px 0 #000; min-width: 18px; }
 
-        .deck-area { display: flex; align-items: center; gap: 4px; margin-left: auto; }
+        .deck-area {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: nowrap;
+        }
 
-        .next-card-container { display: flex; flex-direction: column; align-items: center; margin-right: 4px; }
-        .next-label { font-size: 7px; color: #a8d8ff; }
-        .next-card-slot { width: 28px; height: 36px; background: #3a3a4a; border: 1px solid #555; border-radius: 3px; background-size: cover; background-position: center top; }
+        .next-card-container { display: flex; flex-direction: column; align-items: center; }
+        .next-label { font-size: 8px; color: #a8d8ff; }
+        .next-card-slot { width: 32px; height: 42px; background: #3a3a4a; border: 2px solid #555; border-radius: 4px; background-size: cover; background-position: center top; }
 
         .card-slot {
-            width: 40px; height: 52px;
+            width: 48px; height: 64px;
             background: linear-gradient(180deg, #4a4a5a 0%, #2a2a35 100%);
             border: 2px solid #1a1a22;
-            border-radius: 4px;
+            border-radius: 5px;
             position: relative;
             cursor: pointer;
             transition: transform 0.1s, box-shadow 0.1s;
+            touch-action: manipulation;
         }
-        .card-slot:hover { transform: scale(1.05); }
-        .card-slot.selected { box-shadow: 0 0 10px 3px var(--clash-gold); border-color: var(--clash-gold); }
+        .card-slot:hover, .card-slot:active { transform: scale(1.05); }
+        .card-slot.selected { box-shadow: 0 0 12px 4px var(--clash-gold); border-color: var(--clash-gold); transform: scale(1.08); }
         .card-slot.has-card { background-size: cover; background-position: center top; }
         .card-slot .elixir-cost {
-            position: absolute; top: 1px; left: 1px;
-            width: 14px; height: 14px;
+            position: absolute; top: 2px; left: 2px;
+            width: 16px; height: 16px;
             background: linear-gradient(180deg, #d855b0 0%, #a040a0 100%);
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 9px; color: #fff; font-weight: bold; border: 1px solid #fff;
+            font-size: 10px; color: #fff; font-weight: bold; border: 1px solid #fff;
         }
         .card-slot .card-hp {
-            position: absolute; top: 1px; right: 1px;
-            background: rgba(0,0,0,0.7); border-radius: 2px; padding: 0 2px;
-            font-size: 7px; color: #2ecc71;
+            position: absolute; top: 2px; right: 2px;
+            background: rgba(0,0,0,0.8); border-radius: 3px; padding: 1px 3px;
+            font-size: 8px; color: #2ecc71;
         }
         .card-key {
-            position: absolute; bottom: 1px; left: 50%; transform: translateX(-50%);
+            position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
             background: rgba(0,0,0,0.8); border: 1px solid var(--clash-gold);
-            border-radius: 2px; padding: 0 4px; font-size: 8px; color: var(--clash-gold);
+            border-radius: 3px; padding: 1px 5px; font-size: 9px; color: var(--clash-gold);
         }
 
         /* Phone */
         .phone-frame {
             width: var(--phone-width); height: var(--phone-height);
-            background: #000; border-radius: 28px; padding: 5px;
-            box-shadow: 0 0 0 2px #333, 0 0 0 4px #1a1a1a, 0 12px 30px rgba(0,0,0,0.5);
+            background: #000; border-radius: 24px; padding: 4px;
+            box-shadow: 0 0 0 2px #333, 0 0 0 4px #1a1a1a, 0 8px 20px rgba(0,0,0,0.5);
+            flex-shrink: 0;
         }
-        .phone-screen { width: 100%; height: 100%; border-radius: 24px; overflow: hidden; position: relative; }
+        .phone-screen { width: 100%; height: 100%; border-radius: 20px; overflow: hidden; position: relative; }
         .phone-notch {
             position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-            width: 50px; height: 12px; background: #000; border-radius: 0 0 10px 10px; z-index: 100;
+            width: 45px; height: 10px; background: #000; border-radius: 0 0 8px 8px; z-index: 100;
         }
 
         /* Screens */
@@ -116,17 +136,18 @@
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background-image: url('https://pfst.cf2.poecdn.net/base/image/34d09a9f353c6a595f2cc6dc6c38cc4b3b88cbb043a739d67fb70762c2137b60?w=1080&h=1600');
             background-size: cover; background-position: center;
-            display: flex; justify-content: center; align-items: flex-end; padding-bottom: 40px; z-index: 10;
+            display: flex; justify-content: center; align-items: flex-end; padding-bottom: 35px; z-index: 10;
         }
         #battle-btn-overlay {
-            padding: 8px 25px; font-family: 'Luckiest Guy', cursive; font-size: 16px; color: #5c3d00;
+            padding: 10px 28px; font-family: 'Luckiest Guy', cursive; font-size: 18px; color: #5c3d00;
             background: linear-gradient(180deg, #ffe066 0%, #f7b529 50%, #c98b1d 100%);
-            border: none; border-radius: 8px; cursor: pointer;
-            box-shadow: 0 3px 0 #8b6914; animation: battlePulse 2s infinite;
+            border: none; border-radius: 10px; cursor: pointer;
+            box-shadow: 0 4px 0 #8b6914; animation: battlePulse 2s infinite;
+            touch-action: manipulation;
         }
         @keyframes battlePulse {
-            0%, 100% { box-shadow: 0 3px 0 #8b6914, 0 0 12px rgba(247,181,41,0.3); }
-            50% { box-shadow: 0 3px 0 #8b6914, 0 0 20px rgba(247,181,41,0.6); }
+            0%, 100% { box-shadow: 0 4px 0 #8b6914, 0 0 15px rgba(247,181,41,0.3); }
+            50% { box-shadow: 0 4px 0 #8b6914, 0 0 25px rgba(247,181,41,0.6); }
         }
         #battle-btn-overlay::before { content: '⚔️ '; }
 
@@ -136,44 +157,43 @@
         }
         .modal-content {
             background: linear-gradient(180deg, #2d5a87 0%, #1a3a5c 100%);
-            border: 3px solid var(--clash-gold); border-radius: 12px; padding: 18px 22px;
+            border: 3px solid var(--clash-gold); border-radius: 14px; padding: 20px 25px;
             text-align: center; animation: modalPop 0.3s ease-out; position: relative;
         }
         @keyframes modalPop { 0% { transform: scale(0.7); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-        .modal-title { font-size: 18px; color: var(--clash-gold); text-shadow: 2px 2px 0 #1a3a5c; margin-bottom: 12px; }
-        .mode-buttons { display: flex; flex-direction: column; gap: 8px; }
-        .clash-btn { font-family: 'Luckiest Guy', cursive; font-size: 13px; padding: 8px 18px; border: none; border-radius: 6px; cursor: pointer; }
+        .modal-title { font-size: 20px; color: var(--clash-gold); text-shadow: 2px 2px 0 #1a3a5c; margin-bottom: 14px; }
+        .mode-buttons { display: flex; flex-direction: column; gap: 10px; }
+        .clash-btn { font-family: 'Luckiest Guy', cursive; font-size: 14px; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; touch-action: manipulation; }
         .clash-btn-gold { background: linear-gradient(180deg, #ffe066 0%, #f7b529 50%, #c98b1d 100%); color: #5c3d00; box-shadow: 0 3px 0 #8b6914; }
         .clash-btn-blue { background: linear-gradient(180deg, #5fa8d3 0%, #3d7ea6 100%); color: #fff; box-shadow: 0 3px 0 #2a5a7a; }
         .close-modal {
-            position: absolute; top: -8px; right: -8px; width: 22px; height: 22px;
+            position: absolute; top: -10px; right: -10px; width: 26px; height: 26px;
             background: #e74c3c; border: 2px solid #fff; border-radius: 50%; color: #fff;
-            font-size: 12px; cursor: pointer; display: flex; justify-content: center; align-items: center;
+            font-size: 14px; cursor: pointer; display: flex; justify-content: center; align-items: center;
         }
 
-        .countdown-number { font-size: 90px; color: var(--clash-gold); text-shadow: 0 0 25px rgba(247,181,41,0.8), 0 4px 0 #c98b1d; animation: countPulse 1s ease-in-out; }
+        .countdown-number { font-size: 80px; color: var(--clash-gold); text-shadow: 0 0 25px rgba(247,181,41,0.8), 0 4px 0 #c98b1d; animation: countPulse 1s ease-in-out; }
         @keyframes countPulse { 0% { transform: scale(0.3); opacity: 0; } 50% { transform: scale(1.2); } 100% { transform: scale(1); opacity: 1; } }
-        .countdown-go { font-size: 55px; color: #2ecc71; text-shadow: 0 0 25px rgba(46,204,113,0.8), 0 4px 0 #27ae60; }
+        .countdown-go { font-size: 50px; color: #2ecc71; text-shadow: 0 0 25px rgba(46,204,113,0.8), 0 4px 0 #27ae60; }
 
         #battle-screen { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 40; }
 
         .timer-display {
-            position: absolute; top: 15px; right: 6px;
-            background: rgba(0,0,0,0.8); border: 2px solid var(--clash-gold);
-            border-radius: 5px; padding: 1px 6px; z-index: 50;
+            position: absolute; top: 14px; right: 8px;
+            background: rgba(0,0,0,0.85); border: 2px solid var(--clash-gold);
+            border-radius: 6px; padding: 2px 8px; z-index: 50;
         }
-        .timer-text { font-size: 12px; color: #fff; }
+        .timer-text { font-size: 13px; color: #fff; }
 
         /* Battlefield - CR Style */
         .battlefield {
             width: 100%; height: 100%; position: relative; overflow: hidden;
             background: #4a9c4d;
+            touch-action: none;
         }
 
         /* Grass areas */
-        .grass-top, .grass-bottom {
-            position: absolute; left: 0; right: 0; height: 46%;
-        }
+        .grass-top, .grass-bottom { position: absolute; left: 0; right: 0; height: 46%; }
         .grass-top {
             top: 0;
             background: linear-gradient(180deg, #3d8040 0%, #4a9c4d 30%, #55a858 50%, #4a9c4d 80%, #408545 100%);
@@ -182,8 +202,6 @@
             bottom: 0;
             background: linear-gradient(180deg, #408545 0%, #4a9c4d 20%, #55a858 50%, #4a9c4d 70%, #3d8040 100%);
         }
-
-        /* Grass stripes */
         .grass-top::before, .grass-bottom::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
             background: repeating-linear-gradient(90deg, transparent 0px, transparent 18px, rgba(255,255,255,0.04) 18px, rgba(255,255,255,0.04) 36px);
@@ -202,155 +220,173 @@
 
         /* Bridges */
         .bridge {
-            position: absolute; top: 43%; width: 38px; height: 48px;
+            position: absolute; top: 43%; width: 36px; height: 44px;
             background: linear-gradient(180deg, #b89868 0%, #8a6840 40%, #6a4830 100%);
             border: 2px solid #503020; border-radius: 3px; z-index: 8;
         }
         .bridge::before {
             content: ''; position: absolute; top: 3px; left: 3px; right: 3px; height: 5px;
-            background: repeating-linear-gradient(90deg, #705030 0px, #705030 6px, #8a6840 6px, #8a6840 8px);
+            background: repeating-linear-gradient(90deg, #705030 0px, #705030 5px, #8a6840 5px, #8a6840 7px);
         }
         .bridge.left { left: 8%; }
         .bridge.right { right: 8%; }
 
-        /* Territory overlay */
-        .territory-overlay {
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            pointer-events: none; z-index: 6; opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .territory-overlay.active { opacity: 1; pointer-events: auto; }
-        .valid-zone {
-            position: absolute; background: rgba(46, 204, 113, 0.25);
-            border: 2px dashed rgba(46, 204, 113, 0.6);
-        }
-        .invalid-zone {
-            position: absolute; background: rgba(231, 76, 60, 0.2);
-        }
-
         /* Decorations */
         .bush {
-            position: absolute; width: 18px; height: 12px;
+            position: absolute; width: 16px; height: 10px;
             background: radial-gradient(ellipse, #2a6a25 0%, #1a4a15 100%);
             border-radius: 50% 50% 40% 40%; z-index: 4;
         }
 
         /* Towers */
         .tower { position: absolute; display: flex; flex-direction: column; align-items: center; z-index: 12; }
-        .tower-hp-bar { width: 32px; height: 4px; background: #300; border: 1px solid #500; border-radius: 2px; overflow: hidden; margin-bottom: 1px; }
+        .tower-hp-bar { width: 30px; height: 4px; background: #300; border: 1px solid #500; border-radius: 2px; overflow: hidden; margin-bottom: 1px; }
         .tower-hp-fill { height: 100%; background: linear-gradient(180deg, #ff6b6b 0%, #e74c3c 100%); transition: width 0.3s; }
         .tower-hp-fill.blue { background: linear-gradient(180deg, #5dade2 0%, #3498db 100%); }
         .tower-hp-text { font-size: 6px; color: #fff; text-shadow: 1px 1px 0 #000; }
-        .tower-body { width: 28px; height: 36px; border-radius: 3px 3px 2px 2px; position: relative; }
-        .tower-body.king { width: 34px; height: 44px; }
+        .tower-body { width: 26px; height: 34px; border-radius: 3px 3px 2px 2px; position: relative; }
+        .tower-body.king { width: 32px; height: 40px; }
         .princess-tower { background: linear-gradient(180deg, #6b8cae 0%, #3a5a7a 100%); border: 2px solid #2a4a6a; box-shadow: 0 2px 0 #2a4a6a; }
         .princess-tower.red { background: linear-gradient(180deg, #c0392b 0%, #7a1f15 100%); border-color: #5a1510; box-shadow: 0 2px 0 #5a1510; }
         .king-tower { background: linear-gradient(180deg, #7a9cbe 0%, #4a6a8a 100%); border: 2px solid #3a5a7a; box-shadow: 0 2px 0 #3a5a7a; }
         .king-tower.red { background: linear-gradient(180deg, #d63a2c 0%, #8a1f15 100%); border-color: #6a1510; box-shadow: 0 2px 0 #6a1510; }
-        .king-crown { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); font-size: 12px; }
+        .king-crown { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); font-size: 11px; }
 
         /* Archer on tower */
         .archer {
-            position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
-            width: 10px; height: 14px; background: #f5d0a0;
-            border-radius: 3px 3px 0 0;
+            position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%);
+            width: 9px; height: 12px; background: #f5d0a0; border-radius: 3px 3px 0 0;
         }
-        .archer::before { /* head */
-            content: ''; position: absolute; top: -6px; left: 1px;
-            width: 8px; height: 8px; background: #f5d0a0; border-radius: 50%;
-        }
-        .archer::after { /* bow */
-            content: ''; position: absolute; top: 2px; right: -6px;
-            width: 4px; height: 10px; border: 2px solid #8B4513; border-left: none;
-            border-radius: 0 50% 50% 0;
-        }
+        .archer::before { content: ''; position: absolute; top: -5px; left: 1px; width: 7px; height: 7px; background: #f5d0a0; border-radius: 50%; }
+        .archer::after { content: ''; position: absolute; top: 2px; right: -5px; width: 4px; height: 8px; border: 2px solid #8B4513; border-left: none; border-radius: 0 50% 50% 0; }
 
-        .tower.p2-left { top: 7%; left: 10%; }
-        .tower.p2-king { top: 1%; left: 50%; transform: translateX(-50%); }
-        .tower.p2-right { top: 7%; right: 10%; }
-        .tower.p1-left { bottom: 7%; left: 10%; }
-        .tower.p1-king { bottom: 1%; left: 50%; transform: translateX(-50%); }
-        .tower.p1-right { bottom: 7%; right: 10%; }
+        .tower.p2-left { top: 8%; left: 10%; }
+        .tower.p2-king { top: 2%; left: 50%; transform: translateX(-50%); }
+        .tower.p2-right { top: 8%; right: 10%; }
+        .tower.p1-left { bottom: 8%; left: 10%; }
+        .tower.p1-king { bottom: 2%; left: 50%; transform: translateX(-50%); }
+        .tower.p1-right { bottom: 8%; right: 10%; }
 
         /* Troops */
-        .troop { position: absolute; z-index: 20; }
-        .troop-sprite { width: 32px; height: 42px; background-size: contain; background-repeat: no-repeat; background-position: center; }
-        .troop.player1 .troop-sprite { transform: scaleX(-1); }
+        .troop { position: absolute; z-index: 20; pointer-events: none; }
+        .troop-sprite { width: 30px; height: 40px; background-size: contain; background-repeat: no-repeat; background-position: center; }
+        .troop.player2 .troop-sprite { transform: scaleX(-1); }
         .troop-hp-container { display: flex; flex-direction: column; align-items: center; }
         .troop-hp-text { font-size: 6px; color: #fff; text-shadow: 1px 1px 0 #000; }
-        .troop-hp-bar { width: 26px; height: 3px; background: #300; border-radius: 2px; overflow: hidden; }
+        .troop-hp-bar { width: 24px; height: 3px; background: #300; border-radius: 2px; overflow: hidden; }
         .troop-hp-fill { height: 100%; background: #2ecc71; transition: width 0.2s; }
         .troop.player1 .troop-hp-fill { background: #3498db; }
         .troop.player2 .troop-hp-fill { background: #e74c3c; }
 
-        .minion .troop-sprite { width: 22px; height: 28px; }
-        .minion .troop-hp-bar { width: 18px; }
+        .minion .troop-sprite { width: 20px; height: 26px; }
+        .minion .troop-hp-bar { width: 16px; }
+
+        /* Dylan Knight - larger sprite */
+        .knight .troop-sprite { width: 34px; height: 44px; }
+        .knight .troop-hp-bar { width: 28px; }
+
+        /* Spin effect for Dylan */
+        .spin-aura {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(200, 220, 255, 0.6);
+            border-radius: 50%;
+            animation: spinAura 0.3s linear infinite;
+            pointer-events: none;
+            z-index: 19;
+        }
+        @keyframes spinAura {
+            0% { transform: translate(-50%, -50%) rotate(0deg); opacity: 0.8; }
+            100% { transform: translate(-50%, -50%) rotate(360deg); opacity: 0.8; }
+        }
 
         /* Effects */
         .smoke-effect {
-            position: absolute; width: 25px; height: 25px;
+            position: absolute; width: 22px; height: 22px;
             background: radial-gradient(circle, rgba(200,200,200,0.8) 0%, transparent 70%);
             border-radius: 50%; animation: smokeRise 0.5s ease-out forwards; pointer-events: none; z-index: 25;
         }
-        @keyframes smokeRise { 0% { opacity: 1; transform: scale(0.5); } 100% { opacity: 0; transform: scale(1.3) translateY(-15px); } }
+        @keyframes smokeRise { 0% { opacity: 1; transform: scale(0.5); } 100% { opacity: 0; transform: scale(1.3) translateY(-12px); } }
 
         .slash-effect {
-            position: absolute; width: 35px; height: 35px;
+            position: absolute; width: 32px; height: 32px;
             background: radial-gradient(circle, rgba(255,255,150,0.7) 0%, transparent 60%);
             border-radius: 50%; animation: slashFlash 0.25s ease-out forwards; pointer-events: none; z-index: 25;
         }
         @keyframes slashFlash { 0% { opacity: 1; transform: scale(0.5); } 50% { transform: scale(1.1); } 100% { opacity: 0; transform: scale(0.8); } }
 
         .sunray-effect {
-            position: absolute; width: 45px; height: 70px;
+            position: absolute; width: 40px; height: 60px;
             background: linear-gradient(180deg, rgba(255,255,150,0.9) 0%, transparent 100%);
             clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
             animation: sunrayShine 0.7s ease-out forwards; pointer-events: none; z-index: 24;
         }
-        @keyframes sunrayShine { 0% { opacity: 0; transform: translateY(-25px); } 30% { opacity: 1; } 100% { opacity: 0; } }
+        @keyframes sunrayShine { 0% { opacity: 0; transform: translateY(-20px); } 30% { opacity: 1; } 100% { opacity: 0; } }
+
+        /* Summon effect for Dylan */
+        .summon-effect {
+            position: absolute; width: 50px; height: 50px;
+            background: radial-gradient(circle, rgba(100, 150, 255, 0.8) 0%, rgba(50, 100, 200, 0.4) 50%, transparent 70%);
+            border-radius: 50%; animation: summonFlash 0.6s ease-out forwards; pointer-events: none; z-index: 24;
+        }
+        @keyframes summonFlash {
+            0% { opacity: 0; transform: scale(0.3); }
+            40% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 0; transform: scale(1.5); }
+        }
 
         .arrow {
-            position: absolute; width: 20px; height: 3px;
+            position: absolute; width: 18px; height: 3px;
             background: linear-gradient(90deg, #8B4513 0%, #654321 80%, #333 100%);
             transform-origin: left center; z-index: 22; pointer-events: none;
         }
         .arrow::after {
             content: ''; position: absolute; right: -4px; top: -2px;
-            border-left: 6px solid #333; border-top: 3.5px solid transparent; border-bottom: 3.5px solid transparent;
+            border-left: 5px solid #333; border-top: 3px solid transparent; border-bottom: 3px solid transparent;
         }
 
         /* Placement cursor */
         .placement-cursor {
-            position: absolute; width: 40px; height: 40px;
+            position: absolute; width: 36px; height: 36px;
             border: 2px solid var(--clash-gold); border-radius: 50%;
-            background: rgba(247, 181, 41, 0.2);
+            background: rgba(247, 181, 41, 0.25);
             pointer-events: none; z-index: 30; display: none;
         }
-        .placement-cursor.invalid { border-color: #e74c3c; background: rgba(231,76,60,0.2); }
+        .placement-cursor.invalid { border-color: #e74c3c; background: rgba(231,76,60,0.25); }
 
         /* Game Over */
-        .game-over-content { background: linear-gradient(180deg, #2d5a87 0%, #1a3a5c 100%); border: 3px solid var(--clash-gold); border-radius: 12px; padding: 18px 25px; text-align: center; }
-        .game-over-title { font-size: 20px; color: var(--clash-gold); margin-bottom: 6px; }
-        .game-over-score { font-size: 13px; color: #a8d8ff; margin-bottom: 12px; }
+        .game-over-content { background: linear-gradient(180deg, #2d5a87 0%, #1a3a5c 100%); border: 3px solid var(--clash-gold); border-radius: 14px; padding: 20px 28px; text-align: center; }
+        .game-over-title { font-size: 18px; color: var(--clash-gold); margin-bottom: 8px; }
+        .game-over-score { font-size: 14px; color: #a8d8ff; margin-bottom: 14px; }
+
+        /* Mobile adjustments */
+        @media (max-width: 400px) {
+            .card-slot { width: 44px; height: 58px; }
+            .next-card-slot { width: 28px; height: 36px; }
+        }
     </style>
 </head>
 <body>
     <div class="game-wrapper">
+        <!-- Player 2 / AI Controls - TOP -->
         <div class="external-controls top" id="p2-controls">
-            <div class="player-info">
-                <span class="player-name">PLAYER 2</span>
-                <div class="crown-count"><i class="fas fa-crown crown-icon"></i><span class="crown-number" id="p2-crowns">0</span></div>
+            <div class="controls-row">
+                <div class="player-info">
+                    <span class="player-name" id="p2-name">PLAYER 2</span>
+                    <div class="crown-count"><i class="fas fa-crown crown-icon"></i><span class="crown-number" id="p2-crowns">0</span></div>
+                </div>
+                <div class="elixir-container">
+                    <div class="elixir-bar"><div class="elixir-fill" id="p2-elixir-fill"></div></div>
+                    <span class="elixir-count" id="p2-elixir-count">5</span>
+                </div>
             </div>
-            <div class="elixir-container">
-                <div class="elixir-bar"><div class="elixir-fill" id="p2-elixir-fill"></div></div>
-                <span class="elixir-count" id="p2-elixir-count">5</span>
-            </div>
-            <div class="deck-area">
+            <div class="deck-area" id="p2-deck-area">
                 <div class="next-card-container">
                     <span class="next-label">NEXT</span>
                     <div class="next-card-slot" id="p2-next-card"></div>
                 </div>
-                <div id="p2-deck"></div>
+                <div id="p2-deck" style="display:flex;gap:4px;"></div>
             </div>
         </div>
 
@@ -373,7 +409,7 @@
                 </div>
 
                 <div class="modal-overlay" id="countdown-overlay">
-                    <div class="countdown-number" id="countdown-text">5</div>
+                    <div class="countdown-number" id="countdown-text">3</div>
                 </div>
 
                 <div id="battle-screen">
@@ -402,7 +438,7 @@
                         </div>
                         <div class="tower p2-king" id="tower-p2-king">
                             <span class="tower-hp-text" id="p2-king-hp-text">5000</span>
-                            <div class="tower-hp-bar" style="width:38px"><div class="tower-hp-fill" id="p2-king-hp-fill"></div></div>
+                            <div class="tower-hp-bar" style="width:36px"><div class="tower-hp-fill" id="p2-king-hp-fill"></div></div>
                             <div class="tower-body king king-tower red"><span class="king-crown">👑</span></div>
                         </div>
                         <div class="tower p2-right" id="tower-p2-right">
@@ -419,7 +455,7 @@
                         </div>
                         <div class="tower p1-king" id="tower-p1-king">
                             <span class="tower-hp-text" id="p1-king-hp-text">5000</span>
-                            <div class="tower-hp-bar" style="width:38px"><div class="tower-hp-fill blue" id="p1-king-hp-fill"></div></div>
+                            <div class="tower-hp-bar" style="width:36px"><div class="tower-hp-fill blue" id="p1-king-hp-fill"></div></div>
                             <div class="tower-body king king-tower"><span class="king-crown">👑</span></div>
                         </div>
                         <div class="tower p1-right" id="tower-p1-right">
@@ -442,46 +478,70 @@
             </div>
         </div>
 
+        <!-- Player 1 Controls - BOTTOM -->
         <div class="external-controls bottom" id="p1-controls">
-            <div class="player-info">
-                <span class="player-name blue">PLAYER 1</span>
-                <div class="crown-count"><i class="fas fa-crown crown-icon"></i><span class="crown-number" id="p1-crowns">0</span></div>
-            </div>
-            <div class="elixir-container">
-                <div class="elixir-bar"><div class="elixir-fill" id="p1-elixir-fill"></div></div>
-                <span class="elixir-count" id="p1-elixir-count">5</span>
+            <div class="controls-row">
+                <div class="player-info">
+                    <span class="player-name blue" id="p1-name">PLAYER</span>
+                    <div class="crown-count"><i class="fas fa-crown crown-icon"></i><span class="crown-number" id="p1-crowns">0</span></div>
+                </div>
+                <div class="elixir-container">
+                    <div class="elixir-bar"><div class="elixir-fill" id="p1-elixir-fill"></div></div>
+                    <span class="elixir-count" id="p1-elixir-count">5</span>
+                </div>
             </div>
             <div class="deck-area">
                 <div class="next-card-container">
                     <span class="next-label">NEXT</span>
                     <div class="next-card-slot" id="p1-next-card"></div>
                 </div>
-                <div id="p1-deck"></div>
+                <div id="p1-deck" style="display:flex;gap:4px;"></div>
             </div>
         </div>
     </div>
 
 <script>
+// Card definitions
 const CARDS = {
     'die-lan': {
-        name: 'Die Lan', elixir: 4, hp: 800, damage: 100, attackSpeed: 1000, speed: 2,
+        name: 'Die Lan', elixir: 4,
+        hp: 300, damage: 100, attackSpeed: 1000, speed: 2.2,
         cardImage: 'https://pfst.cf2.poecdn.net/base/image/45932116d33a2cd5c181baa2ed52e34e0935b3ac45923761a01ed7ece6500bd3?w=408&h=612',
         idleImage: 'https://pfst.cf2.poecdn.net/base/image/7ee4a14b0589f34276bb1530c4e9fe0ea8f67f86ba3c4a76941fc22defc53af2?w=408&h=612',
         slashImage: 'https://pfst.cf2.poecdn.net/base/image/1d4b464ba54c057d257486ed5f3c609e25eed7aff317c78afd94248257b5bee9?w=408&h=612',
         saluteImage: 'https://pfst.cf2.poecdn.net/base/image/0c925df52b9371b346db27603d5847acc2c4a0ba70812ea460eef4dd495cb425?w=408&h=612',
         minionImage: 'https://pfst.cf2.poecdn.net/base/image/a77a376b8e7195b5f89fd32642b3bbf0532368cb09571dc1ebb336efb19af5cc?w=408&h=612',
-        minionHP: 200, minionDamage: 50, minionSpeed: 1.2, saluteCooldown: 6000
+        minionHP: 100, minionDamage: 40, minionAttackSpeed: 500, minionSpeed: 1.2,
+        saluteCooldown: 2000, type: 'salute'
+    },
+    'little-princess': {
+        name: 'Little Princess', elixir: 4,
+        hp: 200, damage: 100, attackSpeed: 1200, speed: 1.5, // Pretty slow
+        cardImage: 'https://pfst.cf2.poecdn.net/base/image/c3e747366ca4913a3d47863fd68226e7054f2f9cdae059663273d60069b7232f?w=408&h=612',
+        idleImage: 'https://pfst.cf2.poecdn.net/base/image/a8778dc7ed4f38e7c2599b5814796f47e69c4282c8d05de63d560cedf36b62f4?w=408&h=612',
+        slashImage: 'https://pfst.cf2.poecdn.net/base/image/a8778dc7ed4f38e7c2599b5814796f47e69c4282c8d05de63d560cedf36b62f4?w=408&h=612',
+        // Dylan the Knight
+        knightIdleImage: 'https://pfst.cf2.poecdn.net/base/image/d3838a9db5f3154e23f0160c094318d58798ddf11d91a841d8c1db1443864ec0?w=408&h=612',
+        knightSpinImage: 'https://pfst.cf2.poecdn.net/base/image/8c7a7d27d2491e665c5cd2e8970f88c6aa8e5c5c268722661492ee6db0c6aa41?w=408&h=612',
+        knightHP: 700,
+        knightDamage: 150, // Spin damage
+        knightSpeed: 1.0, // Dylan is slower
+        summonCooldown: 4000, // Summon Dylan every 4 seconds
+        type: 'summon'
     }
 };
 
-const BF = { width: 290, height: 530, riverTop: 243, riverBottom: 286 };
+// Both cards auto-added to deck since we need more than 4 cards
+const DECK_CARDS = ['die-lan', 'little-princess'];
+
+const BF = { width: 290, height: 492, riverTop: 226, riverBottom: 265 };
 const BRIDGES = [
-    { x: 35, y: 264 },
-    { x: 245, y: 264 }
+    { x: 38, y: 245 },
+    { x: 252, y: 245 }
 ];
 
 const gameState = {
-    mode: 'ai', // 'ai' or '2p'
+    mode: 'ai',
     timeRemaining: 180,
     gameActive: false,
     selectedCard: { player: null, index: null },
@@ -489,8 +549,8 @@ const gameState = {
     troopIdCounter: 0,
     archers: [],
 
-    player1: { elixir: 5, crowns: 0, towers: { left: 3000, king: 5000, right: 3000 }, hand: [], nextCard: 'die-lan' },
-    player2: { elixir: 5, crowns: 0, towers: { left: 3000, king: 5000, right: 3000 }, hand: [], nextCard: 'die-lan' }
+    player1: { elixir: 5, crowns: 0, towers: { left: 3000, king: 5000, right: 3000 }, hand: [], nextCard: null },
+    player2: { elixir: 5, crowns: 0, towers: { left: 3000, king: 5000, right: 3000 }, hand: [], nextCard: null }
 };
 
 // ==================== UI ====================
@@ -503,6 +563,10 @@ function selectAIMode() {
     document.getElementById('lobby-screen').style.display = 'none';
     document.getElementById('p1-controls').style.display = 'flex';
     document.getElementById('p2-controls').style.display = 'flex';
+
+    document.getElementById('p1-name').textContent = 'PLAYER';
+    document.getElementById('p2-name').textContent = 'AI';
+
     startCountdown();
 }
 
@@ -512,6 +576,10 @@ function selectTwoPlayerMode() {
     document.getElementById('lobby-screen').style.display = 'none';
     document.getElementById('p1-controls').style.display = 'flex';
     document.getElementById('p2-controls').style.display = 'flex';
+
+    document.getElementById('p1-name').textContent = 'PLAYER 1';
+    document.getElementById('p2-name').textContent = 'PLAYER 2';
+
     startCountdown();
 }
 
@@ -546,7 +614,7 @@ function startGame() {
     setupHands();
     renderHands();
     updateAllDisplays();
-    setupBattlefieldClick();
+    setupBattlefieldTouch();
     initArchers();
 
     gameState.gameActive = true;
@@ -555,7 +623,7 @@ function startGame() {
     gameState.gameLoopInterval = setInterval(gameLoop, 50);
 
     if (gameState.mode === 'ai') {
-        gameState.aiInterval = setInterval(aiTurn, 2000);
+        gameState.aiInterval = setInterval(aiTurn, 2500);
     }
 }
 
@@ -566,15 +634,19 @@ function resetGameState() {
     gameState.selectedCard = { player: null, index: null };
     gameState.archers = [];
 
-    gameState.player1 = { elixir: 5, crowns: 0, towers: { left: 3000, king: 5000, right: 3000 }, hand: [], nextCard: 'die-lan' };
-    gameState.player2 = { elixir: 5, crowns: 0, towers: { left: 3000, king: 5000, right: 3000 }, hand: [], nextCard: 'die-lan' };
+    gameState.player1 = { elixir: 5, crowns: 0, towers: { left: 3000, king: 5000, right: 3000 }, hand: [], nextCard: null };
+    gameState.player2 = { elixir: 5, crowns: 0, towers: { left: 3000, king: 5000, right: 3000 }, hand: [], nextCard: null };
 
-    document.querySelectorAll('.troop, .arrow, .smoke-effect, .slash-effect, .sunray-effect').forEach(e => e.remove());
+    document.querySelectorAll('.troop, .arrow, .smoke-effect, .slash-effect, .sunray-effect, .summon-effect, .spin-aura').forEach(e => e.remove());
 }
 
 function setupHands() {
-    gameState.player1.hand = ['die-lan'];
-    gameState.player2.hand = ['die-lan'];
+    // Both players get Die Lan and Little Princess (auto-added)
+    gameState.player1.hand = ['die-lan', 'little-princess', null, null];
+    gameState.player1.nextCard = DECK_CARDS[Math.floor(Math.random() * DECK_CARDS.length)];
+
+    gameState.player2.hand = ['die-lan', 'little-princess', null, null];
+    gameState.player2.nextCard = DECK_CARDS[Math.floor(Math.random() * DECK_CARDS.length)];
 }
 
 function renderHands() {
@@ -596,7 +668,8 @@ function renderHands() {
                 slot.classList.add('has-card');
                 slot.style.backgroundImage = `url('${card.cardImage}')`;
                 slot.innerHTML = `<div class="elixir-cost">${card.elixir}</div><div class="card-hp">${card.hp}</div><div class="card-key">${keys[i]}</div>`;
-                slot.onclick = () => selectCard(p, i);
+                slot.onclick = (e) => { e.preventDefault(); selectCard(p, i); };
+                slot.ontouchstart = (e) => { e.preventDefault(); selectCard(p, i); };
 
                 if (gameState.selectedCard.player === p && gameState.selectedCard.index === i) {
                     slot.classList.add('selected');
@@ -612,12 +685,14 @@ function renderHands() {
         const nextEl = document.getElementById(`p${p}-next-card`);
         if (player.nextCard && CARDS[player.nextCard]) {
             nextEl.style.backgroundImage = `url('${CARDS[player.nextCard].cardImage}')`;
+        } else {
+            nextEl.style.backgroundImage = '';
         }
     });
 }
 
 function selectCard(playerNum, index) {
-    if (gameState.mode === 'ai' && playerNum === 2) return; // Can't control AI
+    if (gameState.mode === 'ai' && playerNum === 2) return;
 
     const player = playerNum === 1 ? gameState.player1 : gameState.player2;
     const cardId = player.hand[index];
@@ -632,59 +707,73 @@ function selectCard(playerNum, index) {
     renderHands();
 }
 
-function setupBattlefieldClick() {
+function setupBattlefieldTouch() {
     const bf = document.getElementById('battlefield');
     const cursor = document.getElementById('placement-cursor');
 
     bf.onmousemove = (e) => {
-        if (!gameState.selectedCard.player) {
-            cursor.style.display = 'none';
-            return;
-        }
+        if (!gameState.selectedCard.player) { cursor.style.display = 'none'; return; }
         const rect = bf.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-
-        cursor.style.display = 'block';
-        cursor.style.left = (x - 20) + 'px';
-        cursor.style.top = (y - 20) + 'px';
-
-        if (isValidPlacement(gameState.selectedCard.player, x, y)) {
-            cursor.classList.remove('invalid');
-        } else {
-            cursor.classList.add('invalid');
-        }
+        updateCursor(x, y);
     };
-
     bf.onmouseleave = () => { cursor.style.display = 'none'; };
+    bf.onclick = (e) => handlePlacement(e.clientX, e.clientY);
 
-    bf.onclick = (e) => {
-        if (!gameState.selectedCard.player) return;
-
+    bf.ontouchmove = (e) => {
+        e.preventDefault();
+        if (!gameState.selectedCard.player) { cursor.style.display = 'none'; return; }
+        const touch = e.touches[0];
         const rect = bf.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        if (isValidPlacement(gameState.selectedCard.player, x, y)) {
-            placeCard(gameState.selectedCard.player, gameState.selectedCard.index, x, y);
-            gameState.selectedCard = { player: null, index: null };
-            cursor.style.display = 'none';
-            renderHands();
+        const x = touch.clientX - rect.left;
+        const y = touch.clientY - rect.top;
+        updateCursor(x, y);
+    };
+    bf.ontouchend = (e) => {
+        if (e.changedTouches.length > 0) {
+            const touch = e.changedTouches[0];
+            handlePlacement(touch.clientX, touch.clientY);
         }
+        cursor.style.display = 'none';
     };
 }
 
-function isValidPlacement(playerNum, x, y) {
-    // Can't place in river
-    if (y >= BF.riverTop && y <= BF.riverBottom) return false;
+function updateCursor(x, y) {
+    const cursor = document.getElementById('placement-cursor');
+    cursor.style.display = 'block';
+    cursor.style.left = (x - 18) + 'px';
+    cursor.style.top = (y - 18) + 'px';
+    if (isValidPlacement(gameState.selectedCard.player, x, y)) {
+        cursor.classList.remove('invalid');
+    } else {
+        cursor.classList.add('invalid');
+    }
+}
 
-    const p = playerNum === 1 ? gameState.player1 : gameState.player2;
+function handlePlacement(clientX, clientY) {
+    if (!gameState.selectedCard.player) return;
+    const bf = document.getElementById('battlefield');
+    const rect = bf.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
+
+    if (isValidPlacement(gameState.selectedCard.player, x, y)) {
+        placeCard(gameState.selectedCard.player, gameState.selectedCard.index, x, y);
+        gameState.selectedCard = { player: null, index: null };
+        document.getElementById('placement-cursor').style.display = 'none';
+        renderHands();
+    }
+}
+
+function isValidPlacement(playerNum, x, y) {
+    if (y >= BF.riverTop && y <= BF.riverBottom) return false;
+    if (x < 10 || x > BF.width - 10 || y < 10 || y > BF.height - 10) return false;
+
     const enemy = playerNum === 1 ? gameState.player2 : gameState.player1;
 
-    // Base territory
     if (playerNum === 1) {
-        if (y > BF.riverBottom) return true; // Own side
-        // Check if enemy towers destroyed
+        if (y > BF.riverBottom) return true;
         if (enemy.towers.left <= 0 && x < BF.width / 2) return true;
         if (enemy.towers.right <= 0 && x >= BF.width / 2) return true;
     } else {
@@ -708,10 +797,9 @@ function placeCard(playerNum, index, x, y) {
 
     spawnTroop(cardId, playerNum, x, y);
 
-    // Refill hand after delay
     setTimeout(() => {
         player.hand[index] = player.nextCard;
-        player.nextCard = 'die-lan'; // Only card available
+        player.nextCard = DECK_CARDS[Math.floor(Math.random() * DECK_CARDS.length)];
         renderHands();
     }, 1200);
 
@@ -727,15 +815,42 @@ function spawnTroop(cardId, playerNum, x, y) {
         id, cardId, player: playerNum, x, y,
         hp: card.hp, maxHp: card.hp, damage: card.damage,
         attackSpeed: card.attackSpeed, speed: card.speed,
-        lastAttack: 0, lastSalute: 0, state: 'moving',
-        isMinion: false, parentId: null,
-        saluteCooldown: card.saluteCooldown || 6000,
-        pathTarget: null
+        lastAttack: 0, lastSpecial: 0, state: 'moving',
+        isMinion: false, isKnight: false, parentId: null,
+        specialCooldown: card.saluteCooldown || card.summonCooldown || 99999,
+        type: card.type,
+        hasSummonedKnight: false // Track if Dylan has been summoned
     };
 
     gameState.troops.push(troop);
     createTroopElement(troop, card);
     createSmokeEffect(x, y);
+}
+
+// Spawn Dylan the Knight for Little Princess
+function spawnKnight(parentTroop) {
+    const card = CARDS[parentTroop.cardId];
+    const id = gameState.troopIdCounter++;
+
+    // Spawn Dylan near Little Princess
+    const offsetX = (Math.random() - 0.5) * 30;
+    const offsetY = parentTroop.player === 1 ? -25 : 25;
+
+    const knight = {
+        id, cardId: parentTroop.cardId, player: parentTroop.player,
+        x: parentTroop.x + offsetX, y: parentTroop.y + offsetY,
+        hp: card.knightHP, maxHp: card.knightHP, damage: card.knightDamage,
+        attackSpeed: 800, speed: card.knightSpeed,
+        lastAttack: 0, lastSpinAttack: 0, state: 'moving',
+        isMinion: false, isKnight: true, parentId: parentTroop.id,
+        orbitAngle: 0, // For spinning around princess
+        spinRadius: 35,
+        isSpinning: false
+    };
+
+    gameState.troops.push(knight);
+    createKnightElement(knight, card);
+    createSummonEffect(knight.x, knight.y);
 }
 
 function spawnMinion(parentTroop, offsetX, offsetY) {
@@ -746,7 +861,7 @@ function spawnMinion(parentTroop, offsetX, offsetY) {
         id, cardId: parentTroop.cardId, player: parentTroop.player,
         x: parentTroop.x + offsetX, y: parentTroop.y + offsetY,
         hp: card.minionHP, maxHp: card.minionHP, damage: card.minionDamage,
-        attackSpeed: 1200, speed: card.minionSpeed,
+        attackSpeed: card.minionAttackSpeed || 500, speed: card.minionSpeed,
         lastAttack: 0, state: 'moving', isMinion: true, parentId: parentTroop.id
     };
 
@@ -771,6 +886,22 @@ function createTroopElement(troop, card) {
     document.getElementById('battlefield').appendChild(el);
 }
 
+function createKnightElement(knight, card) {
+    const el = document.createElement('div');
+    el.className = `troop knight player${knight.player}`;
+    el.id = `troop-${knight.id}`;
+    el.innerHTML = `
+        <div class="troop-sprite" style="background-image:url('${card.knightIdleImage}')"></div>
+        <div class="troop-hp-container">
+            <span class="troop-hp-text">${knight.hp}</span>
+            <div class="troop-hp-bar"><div class="troop-hp-fill"></div></div>
+        </div>
+    `;
+    el.style.left = knight.x + 'px';
+    el.style.top = knight.y + 'px';
+    document.getElementById('battlefield').appendChild(el);
+}
+
 function createMinionElement(minion, card) {
     const el = document.createElement('div');
     el.className = `troop minion player${minion.player}`;
@@ -790,14 +921,14 @@ function createMinionElement(minion, card) {
 // ==================== ARCHERS ====================
 function initArchers() {
     const towerPositions = {
-        'p1-left': { x: 45, y: 440, player: 1 },
-        'p1-right': { x: 245, y: 440, player: 1 },
-        'p2-left': { x: 45, y: 60, player: 2 },
-        'p2-right': { x: 245, y: 60, player: 2 }
+        'p1-left': { x: 45, y: 415, player: 1 },
+        'p1-right': { x: 245, y: 415, player: 1 },
+        'p2-left': { x: 45, y: 65, player: 2 },
+        'p2-right': { x: 245, y: 65, player: 2 }
     };
 
     gameState.archers = Object.entries(towerPositions).map(([key, pos]) => ({
-        key, x: pos.x, y: pos.y, player: pos.player, lastShot: 0, range: 120, damage: 50, reloadTime: 1000
+        key, x: pos.x, y: pos.y, player: pos.player, lastShot: 0, range: 110, damage: 50, reloadTime: 1000
     }));
 }
 
@@ -805,11 +936,10 @@ function updateArchers() {
     const now = Date.now();
 
     for (const archer of gameState.archers) {
-        const towerKey = archer.key.split('-')[1]; // 'left' or 'right'
+        const towerKey = archer.key.split('-')[1];
         const playerKey = archer.key.startsWith('p1') ? 'player1' : 'player2';
-        if (gameState[playerKey].towers[towerKey] <= 0) continue; // Tower destroyed
+        if (gameState[playerKey].towers[towerKey] <= 0) continue;
 
-        // Find enemy in range
         let target = null;
         let minDist = Infinity;
 
@@ -840,11 +970,11 @@ function shootArrow(archer, target) {
 
     document.getElementById('battlefield').appendChild(arrow);
 
-    // Animate arrow
-    const duration = 200;
+    const duration = 180;
     const startX = archer.x, startY = archer.y;
     const endX = target.x, endY = target.y;
     const startTime = Date.now();
+    const targetId = target.id;
 
     const animateArrow = () => {
         const elapsed = Date.now() - startTime;
@@ -859,10 +989,10 @@ function shootArrow(archer, target) {
             requestAnimationFrame(animateArrow);
         } else {
             arrow.remove();
-            // Deal damage
-            if (target.hp > 0) {
-                target.hp -= archer.damage;
-                updateTroopElement(target, CARDS[target.cardId]);
+            const t = gameState.troops.find(tr => tr.id === targetId);
+            if (t && t.hp > 0) {
+                t.hp -= archer.damage;
+                updateTroopElement(t, CARDS[t.cardId]);
             }
         }
     };
@@ -879,22 +1009,38 @@ function gameLoop() {
         if (troop.hp <= 0) continue;
 
         const card = CARDS[troop.cardId];
+
+        // Special handling for Dylan the Knight
+        if (troop.isKnight) {
+            updateKnight(troop, card, now);
+            continue;
+        }
+
+        // Find target
         const target = findTarget(troop);
 
         if (target) {
             const dist = getDistance(troop, target);
-            const range = 35;
+            const range = 32;
 
             if (dist <= range) {
                 troop.state = 'attacking';
+
                 if (now - troop.lastAttack >= troop.attackSpeed) {
                     attack(troop, target, card);
                     troop.lastAttack = now;
                 }
 
-                if (!troop.isMinion && card.saluteCooldown && now - troop.lastSalute >= card.saluteCooldown) {
+                // Die Lan salute ability
+                if (!troop.isMinion && troop.type === 'salute' && now - troop.lastSpecial >= troop.specialCooldown) {
                     performSalute(troop, card);
-                    troop.lastSalute = now;
+                    troop.lastSpecial = now;
+                }
+
+                // Little Princess summon Dylan ability
+                if (!troop.isMinion && troop.type === 'summon' && !troop.hasSummonedKnight) {
+                    performSummon(troop, card);
+                    troop.hasSummonedKnight = true;
                 }
             } else {
                 troop.state = 'moving';
@@ -904,10 +1050,18 @@ function gameLoop() {
         updateTroopElement(troop, card);
     }
 
-    // Check for dead main troops -> kill minions
-    const deadMainIds = gameState.troops.filter(t => t.hp <= 0 && !t.isMinion).map(t => t.id);
+    // Check for dead main Die Lan -> kill minions
+    const deadMainIds = gameState.troops.filter(t => t.hp <= 0 && !t.isMinion && !t.isKnight && t.cardId === 'die-lan').map(t => t.id);
     for (const troop of gameState.troops) {
         if (troop.isMinion && deadMainIds.includes(troop.parentId)) {
+            troop.hp = 0;
+        }
+    }
+
+    // Check for dead Little Princess -> kill Dylan
+    const deadPrincessIds = gameState.troops.filter(t => t.hp <= 0 && !t.isKnight && t.cardId === 'little-princess').map(t => t.id);
+    for (const troop of gameState.troops) {
+        if (troop.isKnight && deadPrincessIds.includes(troop.parentId)) {
             troop.hp = 0;
         }
     }
@@ -926,29 +1080,219 @@ function gameLoop() {
     checkGameState();
 }
 
+// Update Dylan the Knight - follows princess, spins around her when attacking
+function updateKnight(knight, card, now) {
+    const parent = gameState.troops.find(t => t.id === knight.parentId);
+
+    // Find nearby enemies to Little Princess (or to Dylan if princess is dead)
+    const centerPoint = (parent && parent.hp > 0) ? parent : knight;
+
+    let nearestEnemy = null;
+    let nearestDist = Infinity;
+    for (const other of gameState.troops) {
+        if (other.player === knight.player || other.hp <= 0 || other.isMinion || other.isKnight) continue;
+        const dist = getDistance(centerPoint, other);
+        if (dist < nearestDist) {
+            nearestDist = dist;
+            nearestEnemy = other;
+        }
+    }
+
+    // Also check towers
+    const enemy = knight.player === 1 ? gameState.player2 : gameState.player1;
+    const towerY = knight.player === 1 ? 65 : 415;
+    const kingY = knight.player === 1 ? 25 : 455;
+    const towers = [
+        { key: 'left', x: 45, y: towerY },
+        { key: 'right', x: 245, y: towerY },
+        { key: 'king', x: 145, y: kingY }
+    ];
+
+    let nearestTower = null;
+    let nearestTowerDist = Infinity;
+    for (const t of towers) {
+        if (enemy.towers[t.key] > 0) {
+            const dist = Math.hypot(centerPoint.x - t.x, centerPoint.y - t.y);
+            if (dist < nearestTowerDist) {
+                nearestTowerDist = dist;
+                nearestTower = { ...t, isTower: true };
+            }
+        }
+    }
+
+    const spinTriggerRange = 60; // Range to start spinning around princess
+    const spinDamageRange = 45; // Range to damage enemies while spinning
+
+    // Check if there are enemies/towers close enough to trigger spin mode
+    const shouldSpin = (nearestEnemy && nearestDist < spinTriggerRange) ||
+                       (nearestTower && nearestTowerDist < spinTriggerRange);
+
+    if (shouldSpin && parent && parent.hp > 0) {
+        // SPIN MODE: Circle around Little Princess, damaging everything in path
+        knight.isSpinning = true;
+        knight.orbitAngle += 0.12; // Fast orbit speed when spinning
+
+        const targetX = parent.x + Math.cos(knight.orbitAngle) * knight.spinRadius;
+        const targetY = parent.y + Math.sin(knight.orbitAngle) * knight.spinRadius;
+
+        // Move to orbit position
+        knight.x += (targetX - knight.x) * 0.25;
+        knight.y += (targetY - knight.y) * 0.25;
+
+        // Spin attack - damage all nearby enemies while circling
+        if (now - knight.lastSpinAttack >= 500) {
+            performSpinAttack(knight, card);
+            knight.lastSpinAttack = now;
+        }
+
+        updateKnightSprite(knight, card.knightSpinImage);
+    }
+    // If princess is alive but no enemies nearby, follow her
+    else if (parent && parent.hp > 0) {
+        knight.isSpinning = false;
+
+        // Follow behind Little Princess
+        const followDist = 25;
+        const dir = parent.player === 1 ? 1 : -1; // Follow behind based on direction
+        const targetX = parent.x;
+        const targetY = parent.y + (followDist * dir);
+
+        const dist = Math.hypot(targetX - knight.x, targetY - knight.y);
+        if (dist > 10) {
+            knight.x += (targetX - knight.x) * 0.1;
+            knight.y += (targetY - knight.y) * 0.1;
+        }
+
+        updateKnightSprite(knight, card.knightIdleImage);
+    }
+    // Princess is dead - Dylan fights alone, moves towards targets
+    else {
+        knight.isSpinning = false;
+
+        // Find and move towards target
+        const target = nearestEnemy || nearestTower;
+        if (target) {
+            const dist = target.isTower ? nearestTowerDist : nearestDist;
+
+            if (dist < 35) {
+                // Close enough to attack
+                if (now - knight.lastSpinAttack >= 600) {
+                    if (target.isTower) {
+                        const p = knight.player === 1 ? gameState.player2 : gameState.player1;
+                        p.towers[target.key] = Math.max(0, p.towers[target.key] - knight.damage);
+                        updateTowerDisplay(knight.player === 1 ? 2 : 1, target.key);
+                    } else {
+                        target.hp -= knight.damage;
+                    }
+                    createSlashEffect(knight.x, knight.y);
+                    knight.lastSpinAttack = now;
+                }
+                updateKnightSprite(knight, card.knightSpinImage);
+            } else {
+                moveTowardsWithBridge(knight, target);
+                updateKnightSprite(knight, card.knightIdleImage);
+            }
+        }
+    }
+
+    updateKnightElement(knight, card);
+}
+
+function performSpinAttack(knight, card) {
+    const spinRange = 40;
+
+    // Create spin visual effect
+    createSpinAura(knight.x, knight.y);
+
+    // Damage all nearby enemies
+    for (const other of gameState.troops) {
+        if (other.player === knight.player || other.hp <= 0) continue;
+        const dist = getDistance(knight, other);
+        if (dist < spinRange) {
+            other.hp -= knight.damage;
+            createSlashEffect(other.x, other.y);
+        }
+    }
+}
+
+function createSpinAura(x, y) {
+    const aura = document.createElement('div');
+    aura.className = 'spin-aura';
+    aura.style.left = x + 'px';
+    aura.style.top = y + 'px';
+    document.getElementById('battlefield').appendChild(aura);
+    setTimeout(() => aura.remove(), 300);
+}
+
+function updateKnightSprite(knight, url) {
+    const el = document.getElementById(`troop-${knight.id}`);
+    if (el) {
+        const sprite = el.querySelector('.troop-sprite');
+        if (sprite.style.backgroundImage !== `url("${url}")`) {
+            sprite.style.backgroundImage = `url('${url}')`;
+        }
+    }
+}
+
+function updateKnightElement(knight, card) {
+    const el = document.getElementById(`troop-${knight.id}`);
+    if (!el) return;
+    el.style.left = knight.x + 'px';
+    el.style.top = knight.y + 'px';
+    el.querySelector('.troop-hp-text').textContent = Math.max(0, Math.round(knight.hp));
+    el.querySelector('.troop-hp-fill').style.width = `${Math.max(0, (knight.hp / knight.maxHp) * 100)}%`;
+}
+
+function findTarget(troop) {
+    let nearestTroop = null, nearestTroopDist = Infinity;
+    for (const other of gameState.troops) {
+        if (other.player === troop.player || other.hp <= 0) continue;
+        const dist = getDistance(troop, other);
+        if (dist < nearestTroopDist) { nearestTroopDist = dist; nearestTroop = other; }
+    }
+
+    if (nearestTroop) return nearestTroop;
+
+    const enemy = troop.player === 1 ? gameState.player2 : gameState.player1;
+    const towerY = troop.player === 1 ? 65 : 415;
+    const kingY = troop.player === 1 ? 25 : 455;
+
+    const towers = [
+        { key: 'left', x: 45, y: towerY },
+        { key: 'right', x: 245, y: towerY },
+        { key: 'king', x: 145, y: kingY }
+    ];
+
+    let closest = null, closestDist = Infinity;
+    for (const t of towers) {
+        if (enemy.towers[t.key] > 0) {
+            const dist = Math.hypot(troop.x - t.x, troop.y - t.y);
+            if (dist < closestDist) { closestDist = dist; closest = { ...t, isTower: true, player: troop.player === 1 ? 2 : 1 }; }
+        }
+    }
+    return closest;
+}
+
 function moveTowardsWithBridge(troop, target) {
     const troopInTop = troop.y < BF.riverTop;
     const troopInBottom = troop.y > BF.riverBottom;
-    const targetInTop = target.y < BF.riverTop || (target.isTower && target.player === 2);
-    const targetInBottom = target.y > BF.riverBottom || (target.isTower && target.player === 1);
+    const targetY = target.y !== undefined ? target.y : (target.player === 2 ? 65 : 415);
+    const targetInTop = targetY < BF.riverTop;
+    const targetInBottom = targetY > BF.riverBottom;
 
-    // Need to cross river?
     if ((troopInTop && targetInBottom) || (troopInBottom && targetInTop)) {
-        // Find closest bridge
         const closestBridge = BRIDGES.reduce((closest, bridge) => {
             const dist = Math.hypot(troop.x - bridge.x, troop.y - bridge.y);
             return dist < closest.dist ? { bridge, dist } : closest;
         }, { dist: Infinity }).bridge;
 
-        // Move to bridge first
         const bridgeDist = Math.hypot(troop.x - closestBridge.x, troop.y - closestBridge.y);
-        if (bridgeDist > 15) {
+        if (bridgeDist > 12) {
             moveTowards(troop, closestBridge);
             return;
         }
     }
 
-    // Direct movement
     moveTowards(troop, target);
 }
 
@@ -962,34 +1306,6 @@ function moveTowards(troop, target) {
     }
 }
 
-function findTarget(troop) {
-    // Nearest enemy troop
-    let nearest = null, nearestDist = Infinity;
-    for (const other of gameState.troops) {
-        if (other.player === troop.player || other.hp <= 0) continue;
-        const dist = getDistance(troop, other);
-        if (dist < nearestDist) { nearestDist = dist; nearest = other; }
-    }
-    if (nearest && nearestDist < 100) return nearest;
-
-    // Target tower
-    const enemy = troop.player === 1 ? gameState.player2 : gameState.player1;
-    const towers = [
-        { key: 'left', x: troop.player === 1 ? 45 : 45, y: troop.player === 1 ? 60 : 440 },
-        { key: 'right', x: troop.player === 1 ? 245 : 245, y: troop.player === 1 ? 60 : 440 },
-        { key: 'king', x: 145, y: troop.player === 1 ? 20 : 480 }
-    ];
-
-    let closest = null, closestDist = Infinity;
-    for (const t of towers) {
-        if (enemy.towers[t.key] > 0) {
-            const dist = Math.hypot(troop.x - t.x, troop.y - t.y);
-            if (dist < closestDist) { closestDist = dist; closest = { ...t, isTower: true, player: troop.player === 1 ? 2 : 1 }; }
-        }
-    }
-    return closest;
-}
-
 function getDistance(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
 
 function attack(troop, target, card) {
@@ -1001,8 +1317,11 @@ function attack(troop, target, card) {
         target.hp -= troop.damage;
     }
     createSlashEffect(troop.x, troop.y);
-    updateTroopSprite(troop, card.slashImage);
-    setTimeout(() => { if (troop.hp > 0) updateTroopSprite(troop, card.idleImage); }, 250);
+
+    if (!troop.isMinion && card.slashImage) {
+        updateTroopSprite(troop, card.slashImage);
+        setTimeout(() => { if (troop.hp > 0) updateTroopSprite(troop, card.idleImage); }, 200);
+    }
 }
 
 function performSalute(troop, card) {
@@ -1013,10 +1332,21 @@ function performSalute(troop, card) {
 
     setTimeout(() => {
         const dir = troop.player === 1 ? -1 : 1;
-        [[-20, 12], [20, 12], [-12, 25], [12, 25]].forEach(([ox, oy]) => {
+        [[-18, 10], [18, 10], [-10, 22], [10, 22]].forEach(([ox, oy]) => {
             spawnMinion(troop, ox, oy * dir);
         });
         if (troop.hp > 0) { updateTroopSprite(troop, card.idleImage); troop.state = 'moving'; }
+    }, 350);
+}
+
+function performSummon(troop, card) {
+    // Little Princess calls "Oh DYLAAAAN!"
+    createSummonEffect(troop.x, troop.y - 20);
+
+    setTimeout(() => {
+        if (troop.hp > 0) {
+            spawnKnight(troop);
+        }
     }, 400);
 }
 
@@ -1039,18 +1369,30 @@ function aiTurn() {
     if (!gameState.gameActive || gameState.mode !== 'ai') return;
 
     const ai = gameState.player2;
-    const cardId = ai.hand[0];
-    if (!cardId) return;
 
-    const card = CARDS[cardId];
-    if (ai.elixir < card.elixir) return;
+    let playableIndex = -1;
+    for (let i = 0; i < ai.hand.length; i++) {
+        const cardId = ai.hand[i];
+        if (cardId && CARDS[cardId] && ai.elixir >= CARDS[cardId].elixir) {
+            playableIndex = i;
+            break;
+        }
+    }
 
-    // Pick a random valid position on AI's territory
-    const x = 50 + Math.random() * 190;
-    const y = 30 + Math.random() * 180; // Top half
+    if (playableIndex === -1) return;
 
-    if (isValidPlacement(2, x, y)) {
-        placeCard(2, 0, x, y);
+    const positions = [
+        { x: 50 + Math.random() * 50, y: 30 + Math.random() * 60 },
+        { x: 120 + Math.random() * 50, y: 40 + Math.random() * 80 },
+        { x: 190 + Math.random() * 50, y: 30 + Math.random() * 60 },
+        { x: 80 + Math.random() * 40, y: 80 + Math.random() * 100 },
+        { x: 160 + Math.random() * 40, y: 80 + Math.random() * 100 }
+    ];
+
+    const pos = positions[Math.floor(Math.random() * positions.length)];
+
+    if (isValidPlacement(2, pos.x, pos.y)) {
+        placeCard(2, playableIndex, pos.x, pos.y);
     }
 }
 
@@ -1058,8 +1400,8 @@ function aiTurn() {
 function createSmokeEffect(x, y) {
     const e = document.createElement('div');
     e.className = 'smoke-effect';
-    e.style.left = (x - 12) + 'px';
-    e.style.top = (y + 25) + 'px';
+    e.style.left = (x - 11) + 'px';
+    e.style.top = (y + 20) + 'px';
     document.getElementById('battlefield').appendChild(e);
     setTimeout(() => e.remove(), 500);
 }
@@ -1067,7 +1409,7 @@ function createSmokeEffect(x, y) {
 function createSlashEffect(x, y) {
     const e = document.createElement('div');
     e.className = 'slash-effect';
-    e.style.left = (x - 17) + 'px';
+    e.style.left = (x - 16) + 'px';
     e.style.top = (y - 5) + 'px';
     document.getElementById('battlefield').appendChild(e);
     setTimeout(() => e.remove(), 250);
@@ -1076,10 +1418,19 @@ function createSlashEffect(x, y) {
 function createSunrayEffect(x, y) {
     const e = document.createElement('div');
     e.className = 'sunray-effect';
-    e.style.left = (x - 22) + 'px';
-    e.style.top = (y - 50) + 'px';
+    e.style.left = (x - 20) + 'px';
+    e.style.top = (y - 45) + 'px';
     document.getElementById('battlefield').appendChild(e);
     setTimeout(() => e.remove(), 700);
+}
+
+function createSummonEffect(x, y) {
+    const e = document.createElement('div');
+    e.className = 'summon-effect';
+    e.style.left = (x - 25) + 'px';
+    e.style.top = (y - 25) + 'px';
+    document.getElementById('battlefield').appendChild(e);
+    setTimeout(() => e.remove(), 600);
 }
 
 // ==================== TIMERS ====================
@@ -1145,12 +1496,13 @@ function endGame() {
 
     const p1c = gameState.player1.crowns, p2c = gameState.player2.crowns;
     let title;
-    if (p1c > p2c) title = '🏆 PLAYER 1 WINS! 🏆';
-    else if (p2c > p1c) title = gameState.mode === 'ai' ? '🤖 AI WINS! 🤖' : '🏆 PLAYER 2 WINS! 🏆';
+    if (p1c > p2c) title = gameState.mode === 'ai' ? '🏆 YOU WIN! 🏆' : '🏆 PLAYER 1 WINS! 🏆';
+    else if (p2c > p1c) title = gameState.mode === 'ai' ? '🤖 AI WINS!' : '🏆 PLAYER 2 WINS! 🏆';
     else {
         const hp1 = gameState.player1.towers.left + gameState.player1.towers.king + gameState.player1.towers.right;
         const hp2 = gameState.player2.towers.left + gameState.player2.towers.king + gameState.player2.towers.right;
-        title = hp1 > hp2 ? '🏆 PLAYER 1 WINS! 🏆' : hp2 > hp1 ? (gameState.mode === 'ai' ? '🤖 AI WINS!' : '🏆 PLAYER 2 WINS!') : '⚔️ DRAW! ⚔️';
+        title = hp1 > hp2 ? (gameState.mode === 'ai' ? '🏆 YOU WIN! 🏆' : '🏆 PLAYER 1 WINS! 🏆') :
+                hp2 > hp1 ? (gameState.mode === 'ai' ? '🤖 AI WINS!' : '🏆 PLAYER 2 WINS! 🏆') : '⚔️ DRAW! ⚔️';
     }
 
     document.getElementById('game-over-title').textContent = title;
